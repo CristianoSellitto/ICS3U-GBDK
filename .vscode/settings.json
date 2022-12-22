@@ -1,0 +1,12 @@
+{
+  "[cpp]": {
+    "editor.defaultFormatter": "ms-vscode.cpptools"
+  },
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.python"
+  },
+  "cSpell.words": [
+    "Cristiano",
+    "Sellitto"
+  ]
+}
