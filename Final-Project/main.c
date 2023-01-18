@@ -23,7 +23,7 @@ screen_t splash() {
     screen_t next_screen = GAME;
 
     // Time variable
-    unsigned int timeCounter = 0;
+    unsigned int time = 0;
 
     printf("Test");
 
@@ -40,8 +40,8 @@ screen_t splash() {
         }
 
         // Go to next scene after two seconds of no input
-        timeCounter++;
-        if (timeCounter > (3 * 60)) {
+        time++;
+        if (time > (3 * 60)) {
             return next_screen;
         }
 
@@ -54,13 +54,23 @@ screen_t game() {
     // Get controls
     uint8_t joypadData;
 
+    // Level Variable
+    int currentLvl = 1;
+
     // Time variables
-    unsigned int time = 0;
-    int buttonWaitTime = 0;
+    //unsigned int time = 0;
+    //int buttonWaitTime = 0;
 
     // Position Variables
     int playerXPos = 8;
-    int playerYPos = 16;
+    int playerYPos = 24;
+    int boxGroupLvlOne[1][3] = {
+        {0, 100, 100},
+    }; // Box ID, Box X Pos, Box Y Pos
+
+    // A Button Bools
+    bool aButtonJustPressed = false;
+    bool aButtonStillPressed = false;
 
     // Sound Settings | MUST BE IN THIS ORDER
     NR52_REG = 0X80; // Selects which channels to use (0x80 is all of them)
@@ -74,6 +84,18 @@ screen_t game() {
     // Move meta sprite ID 0 to a point (x, y)
     move_meta_sprite(0, playerXPos, playerYPos);
 
+    switch (currentLvl) {
+        case 1:
+            for (int counter = 1; counter < 1; counter++) {
+                set_sprite_tile(boxGroupLvlOne[counter][0], 16);
+                move_sprite(boxGroupLvlOne[counter][0],
+                            boxGroupLvlOne[counter][1],
+                            boxGroupLvlOne[counter][2]);
+            }
+        default:
+            printf("Error: Not a valid level");
+    }
+
     //SHOW_BKG; // Turn BG on
     SHOW_SPRITES;
     DISPLAY_ON;
@@ -83,26 +105,47 @@ screen_t game() {
         // Get controls
         joypadData = joypad();
 
-        time++;
+        // Add up time
+        //time++;
 
         // Up Button
         if (joypadData & J_UP) {
-            if (buttonWaitTime > time) {
-                playerYPos -= 8;
-                move_meta_sprite(0, playerXPos, playerYPos);
+            if (playerYPos <= 24) {
+                playerYPos = 24;
             } else {
-                buttonWaitTime = time + (3 * 60);
+                playerYPos -= 1;
             }
+            move_meta_sprite(0, playerXPos, playerYPos);
         }
 
         // Down Button
         if (joypadData & J_DOWN) {
-            if (buttonWaitTime > time) {
-                playerYPos += 8;
-                move_meta_sprite(0, playerXPos, playerYPos);
+            if (playerYPos >= 153) {
+                playerYPos = 153;
             } else {
-                buttonWaitTime = time + (3 * 60);
+                playerYPos += 1;
             }
+            move_meta_sprite(0, playerXPos, playerYPos);
+        }
+
+        // Left Button
+        if (joypadData & J_LEFT) {
+            if (playerXPos <= 8) {
+                playerXPos = 8;
+            } else {
+                playerXPos -= 1;
+            }
+            move_meta_sprite(0, playerXPos, playerYPos);
+        }
+
+        // Right Button
+        if (joypadData & J_RIGHT) {
+            if (playerXPos >= 152) {
+                playerXPos = 152;
+            } else {
+                playerXPos += 1;
+            }
+            move_meta_sprite(0, playerXPos, playerYPos);
         }
 
         // Wait until the end of the frame (1/60 of a second)
