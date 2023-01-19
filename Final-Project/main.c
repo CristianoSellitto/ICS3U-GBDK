@@ -9,7 +9,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "TestImage.c"
+#include "boxWorldGBSprites.c"
 #include "MetaSprites.c"
 
 typedef enum { // Define scenes
@@ -62,11 +62,16 @@ screen_t game() {
     //int buttonWaitTime = 0;
 
     // Position Variables
+    const int playerSpawnXPos = 8;
+    const int playerSpawnYPos = 24;
     int playerXPos = 8;
     int playerYPos = 24;
-    int boxGroupLvlOne[1][3] = {
-        {0, 100, 100},
-    }; // Box ID, Box X Pos, Box Y Pos
+    int boxGroupLvlOne[3][3] = {
+        {0, 1, 1},
+        {0, 2, 2},
+        {0, 3, 3},
+    }; // Box ID, Box X Pos, Box Y Pos | Unit formula is 8 + 16 * Pos
+    int boxGroupLvlIDs = 1 * 4;
 
     // A Button Bools
     bool aButtonJustPressed = false;
@@ -77,23 +82,31 @@ screen_t game() {
     NR50_REG = 0X77; // Turns on sound
     NR51_REG = 0XFF; // Sets left and right channels to the max (0x77)
 
-    // Load sprite data (16 sprites) into pos 0
-    set_sprite_data(0, 16, TestImage);
-    // Load meta sprites 0-4
-    set_meta_sprite_tile(0, 1, 2, 3, 4);
-    // Move meta sprite ID 0 to a point (x, y)
-    move_meta_sprite(0, playerXPos, playerYPos);
+    // Load sprite data (35 sprites) into pos 0
+    set_sprite_data(0, 35, boxWorldGBSprites);
 
-    switch (currentLvl) {
-        case 1:
-            for (int counter = 1; counter < 1; counter++) {
-                set_sprite_tile(boxGroupLvlOne[counter][0], 16);
-                move_sprite(boxGroupLvlOne[counter][0],
-                            boxGroupLvlOne[counter][1],
-                            boxGroupLvlOne[counter][2]);
+    if (currentLvl == 1) {
+        // Load player
+        set_meta_sprite_tile(0, 0, 2, 1, 3); // Load meta sprites 0-3 to meta sprite IDs 0-3
+        move_meta_sprite(0, playerXPos, playerYPos); // Move meta sprite ID 0 to a point (x, y)
+        printf("\nPlayer generated");
+        // Load Boxes
+        boxGroupLvlIDs = 3 * 4;
+        int boxNumber = 0;
+        for (int counter = 4; counter <= boxGroupLvlIDs; counter += 4) {
+            if (boxGroupLvlOne[boxNumber][0] == 0) {
+                set_meta_sprite_tile(counter, 8, 10, 9, 11);
+                move_meta_sprite(counter,
+                                 8 + 16 * boxGroupLvlOne[boxNumber][1],
+                                 8 + 16 * boxGroupLvlOne[boxNumber][2]);
+                printf("\nBox type 0 generated");
+            } else {
+                printf("\nBox type invalid");
             }
-        default:
-            printf("Error: Not a valid level");
+            boxNumber++;
+        }
+    } else {
+        printf("\nNot a valid level ID");
     }
 
     //SHOW_BKG; // Turn BG on
@@ -110,8 +123,8 @@ screen_t game() {
 
         // Up Button
         if (joypadData & J_UP) {
-            if (playerYPos <= 24) {
-                playerYPos = 24;
+            if (playerYPos <= 20) {
+                playerYPos = 20;
             } else {
                 playerYPos -= 1;
             }
@@ -120,8 +133,8 @@ screen_t game() {
 
         // Down Button
         if (joypadData & J_DOWN) {
-            if (playerYPos >= 153) {
-                playerYPos = 153;
+            if (playerYPos >= 156) {
+                playerYPos = 156;
             } else {
                 playerYPos += 1;
             }
@@ -130,8 +143,8 @@ screen_t game() {
 
         // Left Button
         if (joypadData & J_LEFT) {
-            if (playerXPos <= 8) {
-                playerXPos = 8;
+            if (playerXPos <= 4) {
+                playerXPos = 4;
             } else {
                 playerXPos -= 1;
             }
@@ -140,12 +153,18 @@ screen_t game() {
 
         // Right Button
         if (joypadData & J_RIGHT) {
-            if (playerXPos >= 152) {
-                playerXPos = 152;
+            if (playerXPos >= 156) {
+                playerXPos = 156;
             } else {
                 playerXPos += 1;
             }
             move_meta_sprite(0, playerXPos, playerYPos);
+        }
+
+        for (int boxNumber = 0; boxNumber <= 3; boxNumber++) {
+            if (playerXPos == boxGroupLvlOne[boxNumber][1] || playerYPos == boxGroupLvlOne[boxNumber][2]) {
+                move_meta_sprite(0, playerSpawnXPos, playerSpawnYPos); // Fix this
+            }
         }
 
         // Wait until the end of the frame (1/60 of a second)

@@ -1,6 +1,6 @@
 /*
 
- TESTIMAGE.H
+ BOXWORLDGBSPRITES.H
 
  Include File.
 
@@ -10,7 +10,7 @@
   Compression          : None.
   Counter              : None.
   Tile size            : 8 x 8
-  Tiles                : 0 to 15
+  Tiles                : 0 to 35
 
   Palette colors       : None.
   SGB Palette          : None.
@@ -24,8 +24,8 @@
 
 
 /* Bank of tiles. */
-#define TestImageBank 0
+#define boxWorldGBSpritesBank 0
 /* Start of tile array. */
-extern unsigned char TestImage[];
+extern unsigned char boxWorldGBSprites[];
 
-/* End of TESTIMAGE.H */
+/* End of BOXWORLDGBSPRITES.H */
