@@ -161,11 +161,25 @@ screen_t game() {
             move_meta_sprite(0, playerXPos, playerYPos);
         }
 
-        for (int boxNumber = 0; boxNumber <= 3; boxNumber++) {
-            if (playerXPos == boxGroupLvlOne[boxNumber][1] || playerYPos == boxGroupLvlOne[boxNumber][2]) {
-                move_meta_sprite(0, playerSpawnXPos, playerSpawnYPos); // Fix this
-            }
-        }
+        // Check if the player is moving and is collided with a box
+        // if (joypadData & J_RIGHT || joypadData & J_LEFT || joypadData & J_UP || joypadData & J_DOWN) {
+        //     for (int boxNumber = 0; boxNumber <= 3; boxNumber++) {
+        //         int boxX = (8 + 16 * boxGroupLvlOne[boxNumber][1]) - 11;
+        //         int boxY = (8 + 16 * boxGroupLvlOne[boxNumber][2]) - 11;
+        //         if (playerXPos == boxX || playerYPos == boxY) {
+        //             for (int validXPos = boxX; validXPos <= boxX + 22; validXPos++) {
+        //                 for (int validYPos = boxY; validYPos <= boxY + 22; validYPos++) {
+        //                     if (playerXPos == validXPos && playerYPos == validYPos) {
+        //                         playerXPos = playerSpawnXPos;
+        //                         playerYPos = playerSpawnYPos;
+        //                         move_meta_sprite(0, playerXPos, playerYPos);
+        //                         printf("\nPlayer lost"); // printf("\nPlayer lost X: %d", validXPos);
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
         // Wait until the end of the frame (1/60 of a second)
         wait_vbl_done();
