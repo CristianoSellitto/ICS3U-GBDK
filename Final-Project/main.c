@@ -58,19 +58,23 @@ screen_t game() {
     int currentLvl = 1;
 
     // Time variables
-    //unsigned int time = 0;
-    //int buttonWaitTime = 0;
+    // unsigned int time = 0;
+    // int buttonWaitTime = 0;
 
     // Position Variables
     const int playerSpawnXPos = 8;
     const int playerSpawnYPos = 24;
     int playerXPos = 8;
     int playerYPos = 24;
+
+    // Box variables
     int boxGroupLvlOne[3][3] = {
         {0, 1, 1},
         {0, 2, 2},
         {0, 3, 3},
     }; // Box ID, Box X Pos, Box Y Pos | Unit formula is 8 + 16 * Pos
+    int boxXs[100];
+    int boxYs[100];
     int boxGroupLvlIDs = 1 * 4;
 
     // A Button Bools
@@ -86,11 +90,7 @@ screen_t game() {
     set_sprite_data(0, 35, boxWorldGBSprites);
 
     if (currentLvl == 1) {
-        // Load player
-        set_meta_sprite_tile(0, 0, 2, 1, 3); // Load meta sprites 0-3 to meta sprite IDs 0-3
-        move_meta_sprite(0, playerXPos, playerYPos); // Move meta sprite ID 0 to a point (x, y)
-        printf("\nPlayer generated");
-        // Load Boxes
+        // Load boxes for Level 1
         boxGroupLvlIDs = 3 * 4;
         int boxNumber = 0;
         for (int counter = 4; counter <= boxGroupLvlIDs; counter += 4) {
@@ -105,9 +105,34 @@ screen_t game() {
             }
             boxNumber++;
         }
+        for (int boxNumber = 0; boxNumber <= 3; boxNumber++) {
+            // Player reposition values
+            int plrXRepos = -4;
+            int plrYRepos = 15;
+
+            // Min/max box variables
+            int minBoxX = (8 + 16 * boxGroupLvlOne[boxNumber][1]) + plrXRepos;
+            int maxBoxX = minBoxX + plrYRepos;
+            int minBoxY = (8 + 16 * boxGroupLvlOne[boxNumber][2]) + plrXRepos;
+            int maxBoxY = minBoxY + plrYRepos;
+            for (boxNumber = 0; boxNumber > 3; boxNumber++) {
+                for (int validXPos = minBoxX; validXPos <= maxBoxX; validXPos++) {
+                    boxXs[boxNumber] = validXPos;
+                    printf("\nBox X %d set", validXPos);
+                }
+                for (int validYPos = minBoxY; validYPos <= maxBoxY; validYPos++) {
+                    boxYs[boxNumber] = validYPos;
+                    printf("\nBox Y %d set", validYPos);
+                }
+            }
+        }
     } else {
         printf("\nNot a valid level ID");
     }
+        // Load player
+        set_meta_sprite_tile(0, 0, 2, 1, 3); // Load meta sprites 0-3 to meta sprite IDs 0-3
+        move_meta_sprite(0, playerXPos, playerYPos); // Move meta sprite ID 0 to a point (x, y)
+        printf("\nPlayer generated");
 
     //SHOW_BKG; // Turn BG on
     SHOW_SPRITES;
@@ -121,7 +146,7 @@ screen_t game() {
         // Add up time
         //time++;
 
-        // Up Button
+        // Up Button | Move player up
         if (joypadData & J_UP) {
             if (playerYPos <= 20) {
                 playerYPos = 20;
@@ -131,7 +156,7 @@ screen_t game() {
             move_meta_sprite(0, playerXPos, playerYPos);
         }
 
-        // Down Button
+        // Down Button | Move player down
         if (joypadData & J_DOWN) {
             if (playerYPos >= 156) {
                 playerYPos = 156;
@@ -141,7 +166,7 @@ screen_t game() {
             move_meta_sprite(0, playerXPos, playerYPos);
         }
 
-        // Left Button
+        // Left Button | Move player let
         if (joypadData & J_LEFT) {
             if (playerXPos <= 4) {
                 playerXPos = 4;
@@ -151,7 +176,7 @@ screen_t game() {
             move_meta_sprite(0, playerXPos, playerYPos);
         }
 
-        // Right Button
+        // Right Button | Move player right
         if (joypadData & J_RIGHT) {
             if (playerXPos >= 156) {
                 playerXPos = 156;
@@ -161,25 +186,38 @@ screen_t game() {
             move_meta_sprite(0, playerXPos, playerYPos);
         }
 
-        // Check if the player is moving and is collided with a box
-        // if (joypadData & J_RIGHT || joypadData & J_LEFT || joypadData & J_UP || joypadData & J_DOWN) {
+        // A Button | Check if the player is moving and is collided with a box
+        // joypadData & J_RIGHT || joypadData & J_LEFT || joypadData & J_UP || joypadData & J_DOWN
+        // if (joypadData & J_A) {
         //     for (int boxNumber = 0; boxNumber <= 3; boxNumber++) {
-        //         int boxX = (8 + 16 * boxGroupLvlOne[boxNumber][1]) - 11;
-        //         int boxY = (8 + 16 * boxGroupLvlOne[boxNumber][2]) - 11;
-        //         if (playerXPos == boxX || playerYPos == boxY) {
-        //             for (int validXPos = boxX; validXPos <= boxX + 22; validXPos++) {
-        //                 for (int validYPos = boxY; validYPos <= boxY + 22; validYPos++) {
-        //                     if (playerXPos == validXPos && playerYPos == validYPos) {
-        //                         playerXPos = playerSpawnXPos;
-        //                         playerYPos = playerSpawnYPos;
-        //                         move_meta_sprite(0, playerXPos, playerYPos);
-        //                         printf("\nPlayer lost"); // printf("\nPlayer lost X: %d", validXPos);
-        //                     }
+        //         // Player reposition values
+        //         int plrXRepos = -4;
+        //         int plrYRepos = 15;
+
+        //         // Min/max box variables
+        //         int minBoxX = (8 + 16 * boxGroupLvlOne[boxNumber][1]) + plrXRepos;
+        //         int maxBoxX = minBoxX + plrYRepos;
+        //         int minBoxY = (8 + 16 * boxGroupLvlOne[boxNumber][2]) + plrXRepos;
+        //         int maxBoxY = minBoxY + plrYRepos;
+        //         for (int validXPos = minBoxX; validXPos <= maxBoxX; validXPos++) {
+        //             for (int validYPos = minBoxY; validYPos <= maxBoxY; validYPos++) {
+        //                 if (playerXPos == validXPos && playerYPos == validYPos) {
+        //                     playerXPos = playerSpawnXPos;
+        //                     playerYPos = playerSpawnYPos;
+        //                     move_meta_sprite(0, playerXPos, playerYPos);
+        //                     break;
         //                 }
         //             }
         //         }
         //     }
         // }
+
+        // B Button | Player position check
+        if (joypadData & J_B) {
+            //printf("\nPlayer Pos: (%d,", playerXPos);
+            //printf("%d)", playerYPos);
+            printf("Box X: %d", boxXs);
+        }
 
         // Wait until the end of the frame (1/60 of a second)
         wait_vbl_done();
